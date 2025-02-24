@@ -1,5 +1,9 @@
 "use client";
 
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
 import {
   Sheet,
   SheetClose,
@@ -11,9 +15,6 @@ import {
 } from "@/components/ui/sheet";
 import { sidebarLinks } from "@/constants";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 
 export default function MobileNav() {
   const pathname = usePathname();
@@ -31,6 +32,10 @@ export default function MobileNav() {
           />
         </SheetTrigger>
         <SheetContent side="left" className="border-none bg-dark-1">
+          <SheetHeader className="sr-only">
+            <SheetTitle>Menu</SheetTitle>
+            <SheetDescription>Your mobile navigation</SheetDescription>
+          </SheetHeader>
           <Link href="/" className="flex items-center gap-1">
             <Image
               src="/icons/logo.svg"
