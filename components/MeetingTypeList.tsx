@@ -4,12 +4,15 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import HomeCard from "./HomeCard";
+import MeetingModal from "./MeetingModal";
 
 export default function MeetingTypeList() {
   const [meetingState, setMeetingState] = useState<
     "ScheduleMeeting" | "JoiningMeeting" | "InstantMeeting" | undefined
   >();
   const router = useRouter();
+
+  const createMeeting = () => {};
 
   return (
     <section className="grid gird-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
@@ -43,6 +46,15 @@ export default function MeetingTypeList() {
         description="via the invitation link"
         className="bg-yellow-1"
         handleClick={() => setMeetingState("JoiningMeeting")}
+      />
+
+      <MeetingModal
+        isOpen={meetingState === "InstantMeeting"}
+        onClose={() => setMeetingState(undefined)}
+        title="Start an Instant Meeting"
+        className="text-center"
+        buttonText="Start Meeting"
+        handleClick={createMeeting}
       />
     </section>
   );
