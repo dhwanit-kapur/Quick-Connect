@@ -21,6 +21,7 @@ import { LayoutList, Users } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import EndCallButton from "./EndCallButton";
 import Loader from "./Loader";
+import React from "react";
 
 type CallLayoutType = "grid" | "speaker-right" | "speaker-left";
 
@@ -36,7 +37,11 @@ export default function MeetingRoom() {
 
   if (callingState !== CallingState.JOINED) return <Loader />;
 
-  const CallLayout = () => {
+  const MemoizedCallLayout = React.memo(function MemoizedCallLayout({
+    layout,
+  }: {
+    layout: CallLayoutType;
+  }) {
     switch (layout) {
       case "grid":
         return <PaginatedGridLayout />;
@@ -47,24 +52,32 @@ export default function MeetingRoom() {
       default:
         return <SpeakerLayout participantsBarPosition="right" />;
     }
-  };
+  });
 
   return (
     <section className="relative h-screen w-full overflow-hidden pt-4 text-white">
       <div className="relative flex size-full items-center justify-center">
         <div className="flex size-full max-w-[1000px] items-center">
-          <CallLayout />
+          <MemoizedCallLayout layout={layout} />
         </div>
         <div
-          className={cn("h-[calc(100vh-86px)] hidden ml-2", {
-            "show-block": showParticipants,
-          })}
+          className={cn(
+            "h-[calc(100vh-86px)] w-[320px] ml-2 transition-all",
+            showParticipants ? "hidden md:block" : "hidden"
+          )}
         >
           <CallParticipantsList onClose={() => setShowParticipants(false)} />
         </div>
       </div>
 
-      <div className="fixed bottom-0 flex w-full items-center justify-center gap-5 flex-wrap">
+      <div
+        className={cn(
+          "fixed bottom-0 flex w-full items-center justify-center gap-5 sm:gap-3 flex-wrap",
+          {
+            "pr-[320px]": showParticipants,
+          }
+        )}
+      >
         <CallControls />
 
         <DropdownMenu>
@@ -93,7 +106,10 @@ export default function MeetingRoom() {
 
         <CallStatsButton />
 
-        <button onClick={() => setShowParticipants((prev) => !prev)}>
+        <button
+          className="hidden md:block"
+          onClick={() => setShowParticipants((prev) => !prev)}
+        >
           <div className="cursor-pointer rounded-2xl bg-[#19232d] px-4 py-2 hover:bg-[#4c535b]">
             <Users size={20} className="text-white" />
           </div>
