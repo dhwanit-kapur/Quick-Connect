@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import {
   DeviceSettings,
   useCall,
+  useCallStateHooks,
   VideoPreview,
 } from "@stream-io/video-react-sdk";
 import { Button } from "./ui/button";
@@ -15,6 +16,10 @@ export default function MeetingSetup({
   setIsSetupComplete: (value: boolean) => void;
 }) {
   const [isMicCamToggledOn, setIsMicCamToggledOn] = useState<boolean>(false);
+
+  const { useCameraState, useMicrophoneState } = useCallStateHooks();
+  const { camera } = useCameraState();
+  const { microphone } = useMicrophoneState();
 
   const call = useCall();
 
@@ -42,7 +47,13 @@ export default function MeetingSetup({
           <input
             type="checkbox"
             checked={isMicCamToggledOn}
-            onChange={(e) => setIsMicCamToggledOn(e.target.checked)}
+            onChange={async (e) => {
+              setIsMicCamToggledOn(e.target.checked);
+              if (!isMicCamToggledOn) {
+                await camera.disable();
+                await microphone.disable();
+              }
+            }}
           />
           Join with mic and camera off
         </label>
