@@ -13,14 +13,12 @@ import { useParams } from "next/navigation";
 export default function MeetingPage() {
   const params = useParams();
 
-  if (!params.id) return <Loader />;
-
-  const { user, isLoaded } = useUser();
+  const { isLoaded } = useUser();
   const [isSetupComplete, setIsSetupComplete] = useState(false);
 
-  const { call, isCallLoading } = useGetCallById(params.id);
+  const { call, isCallLoading } = useGetCallById(params.id!);
 
-  if (!isLoaded || isCallLoading) return <Loader />;
+  if (!params.id || !isLoaded || isCallLoading) return <Loader />;
 
   return (
     <main>

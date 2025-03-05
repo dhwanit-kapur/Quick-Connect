@@ -68,6 +68,7 @@ export default function CallList({
         setLoading(false);
       } catch (error) {
         toast("Try again later");
+        console.log("Error: ", error);
       }
     };
 
