@@ -1,12 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useGetCalls } from "@/hooks/useGetCalls";
 import { Call, CallRecording } from "@stream-io/video-react-sdk";
 import MeetingCard from "./MeetingCard";
 import Loader from "./Loader";
+import { toast } from "sonner";
 
 export default function CallList({
   type,
@@ -17,6 +18,7 @@ export default function CallList({
   const { previousCalls, upcomingCalls, callRecordings, isLoading } =
     useGetCalls();
   const [recordings, setRecordings] = useState<CallRecording[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const getCalls = () => {
     switch (type) {
@@ -50,17 +52,43 @@ export default function CallList({
     }
   };
 
+  useEffect(() => {
+    const fetchRecordings = async () => {
+      try {
+        setLoading(true);
+        const callData = await Promise.all(
+          callRecordings.map((meeting) => meeting.queryRecordings())
+        );
+
+        const recordings = callData
+          .filter((call) => call.recordings.length > 0)
+          .flatMap((call) => call.recordings);
+
+        setRecordings(recordings);
+        setLoading(false);
+      } catch (error) {
+        toast("Try again later");
+      }
+    };
+
+    if (type === "recordings") fetchRecordings();
+  }, [type, callRecordings]);
+
   const calls = getCalls();
   const noCallsMessage = getNoCallsMessage();
 
-  if (isLoading) return <Loader raisedHeight={true} />;
+  if (isLoading || loading) return <Loader raisedHeight={true} />;
 
   return (
     <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
       {calls && calls.length > 0 ? (
         calls.map((meeting: Call | CallRecording) => (
           <MeetingCard
-            key={(meeting as Call).id}
+            key={
+              type === "recordings"
+                ? (meeting as CallRecording).filename
+                : (meeting as Call).id
+            }
             icon={
               type === "previous"
                 ? "/icons/previous.svg"
@@ -69,13 +97,12 @@ export default function CallList({
                 : "/icons/recordings.svg"
             }
             title={
-              `${(meeting as Call).state.custom.description.substring(
-                0,
-                30
-              )} ...` || "No description"
+              type === "recordings"
+                ? (meeting as CallRecording).filename.substring(0, 20)
+                : (meeting as Call).state?.custom.description.substring(0, 30)
             }
             date={
-              (meeting as Call).state.startsAt?.toLocaleString() ||
+              (meeting as Call).state?.startsAt?.toLocaleString() ||
               (meeting as CallRecording).start_time.toLocaleString()
             }
             isPreviousMeeting={type === "previous"}
