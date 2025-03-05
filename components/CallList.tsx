@@ -18,7 +18,7 @@ export default function CallList({
   const { previousCalls, upcomingCalls, callRecordings, isLoading } =
     useGetCalls();
   const [recordings, setRecordings] = useState<CallRecording[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const getCalls = () => {
     switch (type) {
@@ -97,9 +97,12 @@ export default function CallList({
                 : "/icons/recordings.svg"
             }
             title={
-              type === "recordings"
-                ? (meeting as CallRecording).filename.substring(0, 20)
-                : (meeting as Call).state?.custom.description.substring(0, 30)
+              (type === "recordings"
+                ? (meeting as CallRecording)?.filename?.substring(0, 20)
+                : (meeting as Call).state?.custom?.description?.substring(
+                    0,
+                    30
+                  )) || "Personal Meeting"
             }
             date={
               (meeting as Call).state?.startsAt?.toLocaleString() ||
