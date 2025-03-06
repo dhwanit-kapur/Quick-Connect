@@ -1,5 +1,9 @@
 # QuickConnect - Next.js Video Conferencing App
 
+<p align="center">
+  <img src="./public/images/QuickConnect-Banner.jpg" width="900" height="400" alt="Video Conferencing Banner">
+</p>
+
 This repository contains a feature-heavy video conferencing application built with Next.js, leveraging the latest features for optimal performance, scalability, and maintainability. It utilizes Stream SDK for real-time video and audio communication and Clerk for secure authentication.
 
 ## Live Demo
