@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   CallControls,
   CallingState,
@@ -35,13 +35,19 @@ export default function MeetingRoom() {
   const { useCallCallingState } = useCallStateHooks();
   const callingState = useCallCallingState();
 
-  if (callingState !== CallingState.JOINED) return <Loader />;
+  useEffect(() => {
+    if (callingState === CallingState.LEFT) {
+      router.push("/");
+    }
+  }, [callingState, router]);
 
-  const MemoizedCallLayout = React.memo(function MemoizedCallLayout({
-    layout,
-  }: {
-    layout: CallLayoutType;
-  }) {
+  if (
+    callingState !== CallingState.JOINED &&
+    callingState !== CallingState.LEFT
+  )
+    return <Loader />;
+
+  function CallLayout({ layout }: { layout: CallLayoutType }) {
     switch (layout) {
       case "grid":
         return <PaginatedGridLayout />;
@@ -52,13 +58,13 @@ export default function MeetingRoom() {
       default:
         return <SpeakerLayout participantsBarPosition="right" />;
     }
-  });
+  }
 
   return (
     <section className="relative h-screen w-full overflow-hidden pt-4 text-white">
       <div className="relative flex size-full items-center justify-center">
         <div className="flex size-full max-w-[1000px] items-center">
-          <MemoizedCallLayout layout={layout} />
+          <CallLayout layout={layout} />
         </div>
         <div
           className={cn(
